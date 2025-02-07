@@ -5,7 +5,9 @@
 //  Created by Fernando Fuentes on 07/02/25.
 //
 
-internal class DebugLogger {
+import Foundation
+
+internal class DebugLogger: @unchecked Sendable {
     internal static let shared = DebugLogger(isLoggingEnabled: true)
     
     private var isLoggingEnabled: Bool
