@@ -125,7 +125,7 @@ extension Client {
         if let body = endpoint.body {
             request.httpBody = body
         }
-        logger.log("[Client-Background] Request: \(request)", level: .info)
+        logger.log("Request", data: request.httpBody, level: .info)
         let backgroundSession = URLSession(configuration: sessionConfiguration, delegate: delegate, delegateQueue: nil)
         backgroundSession.downloadTask(with: request).resume()
         
@@ -152,10 +152,10 @@ extension Client {
             do {
                 let data = try Data(contentsOf: location)
                 let decodedResponse = try JSONDecoder().decode(responseModel, from: data)
-                logger.log("[Client-Background] Response: \(decodedResponse)", level: .info)
+                logger.log("Response", data: data, level: .info)
                 return .success(decodedResponse)
             } catch {
-                logger.log("[Client-Background] Decode error: \(error.localizedDescription)", level: .error)
+                logger.log("Decode error: \(error.localizedDescription)", level: .error)
                 return .failure(.unexpectedError(error.localizedDescription))
             }
             
@@ -164,10 +164,10 @@ extension Client {
                 let data = try Data(contentsOf: location)
                 let decodedResponse = try JSONDecoder().decode(ErrorResponse.self, from: data)
                 let message = decodedResponse.message
-                logger.log("[Client-Background] Error Response: \(decodedResponse)", level: .error)
+                logger.log("Error Response:", data: data, level: .error)
                 return .failure(.badRequest(message))
             } catch {
-                logger.log("[Client-Background] Decode error: \(error.localizedDescription)", level: .error)
+                logger.log("Decode error: \(error.localizedDescription)", level: .error)
                 return .failure(.unexpectedError(error.localizedDescription))
             }
             
@@ -175,7 +175,7 @@ extension Client {
             return .failure(.unauthorized)
             
         default:
-            logger.log("[Client-Background] Unexpected StatusCode: \(response.statusCode)", level: .error)
+            logger.log("Unexpected StatusCode: \(response.statusCode)", level: .error)
             return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
         }
     }
