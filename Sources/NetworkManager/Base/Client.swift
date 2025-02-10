@@ -46,37 +46,37 @@ extension Client {
                 return .failure(.noResponse)
             }
             
-            logger.log("[Client]Code: \(response.statusCode), Request:", object: request as? Encodable, level: .info)
+            logger.log("Code: \(response.statusCode), Request:", data: request.httpBody, level: .info)
             
             switch response.statusCode {
                 
             case 200...299:
                 do {
                     let decodedResponse = try JSONDecoder().decode(responseModel, from: data)
-                    logger.log("[Client] Response:", object: decodedResponse as? Encodable, level: .info)
+                    logger.log("Response:", data: data, level: .info)
                     
                     return .success(decodedResponse)
                 } catch {
-                    logger.log("[Client] Decode error: \(error.localizedDescription)", level: .error)
+                    logger.log("Decode error: \(error.localizedDescription)", level: .error)
                     return .failure(.unexpectedError(error.localizedDescription))
                 }
             case 400:
                 do {
                     let decodedResponse = try JSONDecoder().decode(ErrorResponse.self, from: data)
                     let message = decodedResponse.message
-                    logger.log("[Client] Error Response:", object: decodedResponse as? Encodable, level: .error)
+                    logger.log("Error Response:", data: data, level: .error)
                     return .failure(.badRequest(message))
                 } catch {
-                    logger.log("[Client] Decode error: \(error.localizedDescription)", level: .error)
+                    logger.log("Decode error: \(error.localizedDescription)", level: .error)
                     return .failure(.unexpectedError(error.localizedDescription))
                 }
                 
             case 401:
-                logger.log("[Client] Unauthorized", level: .error)
+                logger.log("Unauthorized", level: .error)
                 return .failure(.unauthorized)
                 
             default:
-                logger.log("[Client] Unexpected StatusCode: \(response.statusCode)", level: .error)
+                logger.log("Unexpected StatusCode: \(response.statusCode)", level: .error)
                 return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
             }
         } catch let error as NSError {

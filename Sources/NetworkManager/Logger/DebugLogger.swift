@@ -20,7 +20,7 @@ internal class DebugLogger: @unchecked Sendable {
         self.isLoggingEnabled = isEnabled
     }
     
-    internal func log(_ message: String, object: Encodable? = nil, level: LogLevel = .info, function: String = #function, file: String = #file, line: Int = #line) {
+    internal func log(_ message: String, data: Data? = nil, level: LogLevel = .info, function: String = #function, file: String = #file, line: Int = #line) {
         guard isLoggingEnabled else { return } // Si logging está deshabilitado, no imprime nada
         var logEntry: [String: Any] = [
             "level": level.rawValue,
@@ -30,21 +30,17 @@ internal class DebugLogger: @unchecked Sendable {
             "message": message,
             "timestamp": ISO8601DateFormatter().string(from: Date())
         ]
-        
-        if let object = object {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            
-            if let jsonData = try? encoder.encode(object),
-               let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []),
-               let jsonDictionary = jsonObject as? [String: Any] {
-                logEntry["data"] = jsonDictionary
-            } else {
-                logEntry["data"] = "⚠️ Error encoding object"
+
+        if let data = data {
+            do {
+                let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+                logEntry["data"] = jsonObject
+            } catch {
+                logEntry["data"] = "⚠️ Error decoding Data: \(error.localizedDescription)"
             }
         }
-        
-        // Convertimos el log a JSON para imprimirlo
+
+        // Convertimos el log a JSON para imprimirlo en formato legible
         if let jsonData = try? JSONSerialization.data(withJSONObject: logEntry, options: .prettyPrinted),
            let jsonString = String(data: jsonData, encoding: .utf8) {
             print(jsonString)
