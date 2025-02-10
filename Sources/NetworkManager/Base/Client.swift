@@ -46,14 +46,14 @@ extension Client {
                 return .failure(.noResponse)
             }
             
-            logger.log("[Client] Request: \(request), Code: \(response.statusCode)", level: .info)
+            logger.log("[Client]Code: \(response.statusCode), Request:", object: request as? Encodable, level: .info)
             
             switch response.statusCode {
                 
             case 200...299:
                 do {
                     let decodedResponse = try JSONDecoder().decode(responseModel, from: data)
-                    logger.log("[Client] Response: \(decodedResponse)", level: .info)
+                    logger.log("[Client] Response:", object: decodedResponse as? Encodable, level: .info)
                     
                     return .success(decodedResponse)
                 } catch {
@@ -64,7 +64,7 @@ extension Client {
                 do {
                     let decodedResponse = try JSONDecoder().decode(ErrorResponse.self, from: data)
                     let message = decodedResponse.message
-                    logger.log("[Client] Error Response: \(decodedResponse)", level: .error)
+                    logger.log("[Client] Error Response:", object: decodedResponse as? Encodable, level: .error)
                     return .failure(.badRequest(message))
                 } catch {
                     logger.log("[Client] Decode error: \(error.localizedDescription)", level: .error)

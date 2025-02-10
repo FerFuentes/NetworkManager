@@ -20,12 +20,35 @@ internal class DebugLogger: @unchecked Sendable {
         self.isLoggingEnabled = isEnabled
     }
     
-    internal func log(_ message: String, level: LogLevel = .info, function: String = #function, file: String = #file, line: Int = #line) {
+    internal func log(_ message: String, object: Encodable? = nil, level: LogLevel = .info, function: String = #function, file: String = #file, line: Int = #line) {
         guard isLoggingEnabled else { return } // Si logging está deshabilitado, no imprime nada
+        var logEntry: [String: Any] = [
+            "level": level.rawValue,
+            "file": (file as NSString).lastPathComponent,
+            "line": line,
+            "function": function,
+            "message": message,
+            "timestamp": ISO8601DateFormatter().string(from: Date())
+        ]
         
-        let fileName = (file as NSString).lastPathComponent
-        let logMessage = "[\(level.rawValue)] \(fileName):\(line) \(function) - \(message)"
-        print(logMessage)
+        if let object = object {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            
+            if let jsonData = try? encoder.encode(object),
+               let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []),
+               let jsonDictionary = jsonObject as? [String: Any] {
+                logEntry["data"] = jsonDictionary
+            } else {
+                logEntry["data"] = "⚠️ Error encoding object"
+            }
+        }
+        
+        // Convertimos el log a JSON para imprimirlo
+        if let jsonData = try? JSONSerialization.data(withJSONObject: logEntry, options: .prettyPrinted),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            print(jsonString)
+        }
     }
 }
 
