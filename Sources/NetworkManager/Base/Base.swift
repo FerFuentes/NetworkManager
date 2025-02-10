@@ -23,6 +23,7 @@ public protocol Base {
 
 
 extension Base {
+    
     public func createDataBody(withParameters params: [String: String]?, media: [Media]?) -> Data? {
         let lineBreak = "\r\n"
         var body = Data()
@@ -53,4 +54,5 @@ extension Base {
 
         return body
     }
+    
 }
