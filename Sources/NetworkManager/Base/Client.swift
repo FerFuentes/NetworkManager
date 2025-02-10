@@ -46,14 +46,14 @@ extension Client {
                 return .failure(.noResponse)
             }
             
-            logger.log("Code: \(response.statusCode), Request:", data: request.httpBody, level: .info)
+            logger.log("Status code: \(response.statusCode)", data: request.httpBody, level: .info)
             
             switch response.statusCode {
                 
             case 200...299:
                 do {
                     let decodedResponse = try JSONDecoder().decode(responseModel, from: data)
-                    logger.log("Response:", data: data, level: .info)
+                    logger.log("Response", data: data, level: .info)
                     
                     return .success(decodedResponse)
                 } catch {
