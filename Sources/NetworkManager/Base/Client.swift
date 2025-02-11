@@ -40,7 +40,7 @@ extension Client {
                 request.httpBody = body
             }
 
-            let (data, response) = try await endpoint.sessionConfiguration.session.data(for: request)
+            let (data, response) = try await endpoint.session.data(for: request)
             
             guard let response = response as? HTTPURLResponse else {
                 return .failure(.noResponse)
