@@ -108,7 +108,6 @@ extension Client {
 extension Client {
     public func sendRequest<T: Decodable>(
         delegate: URLSessionDelegate,
-        identifier: String,
         endpoint: Base,
         responseModel: T.Type
     ) {
