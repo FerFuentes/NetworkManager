@@ -10,11 +10,12 @@ import Foundation
 public protocol Base {
     var scheme: String { get }
     var host: String { get }
-    var authenticationHeders: [String: String]? { get }
     var version: String { get }
+    var backgroundSessionIdentifier: String? { get }
     var path: String { get }
     var method: RequestMethod { get }
     var header: [String: String]? { get }
+    var authenticationHeders: [String: String]? { get }
     var parameters: [URLQueryItem]? { get }
     var body: Data? { get }
     var boundry: String? { get }

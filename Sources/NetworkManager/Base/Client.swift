@@ -9,7 +9,7 @@ import Network
 
 public protocol Client {
     func sendRequest<T: Decodable>(endpoint: Base, responseModel: T.Type) async -> Result<T, RequestError>
-    func sendRequest<T: Decodable>(delegate: URLSessionDelegate, identifier: String, endpoint: Base, responseModel: T.Type)
+    func sendRequest<T: Decodable>(delegate: URLSessionDelegate, endpoint: Base, responseModel: T.Type)
     func getModelFromLocation<T: Decodable>(_ session: URLSession, downloadTask: URLSessionDownloadTask, location: URL, responseModel: T.Type) -> Result<T, RequestError>
 }
 
@@ -131,7 +131,7 @@ extension Client {
             request.httpBody = body
         }
         
-        let sessionConfiguration = URLSessionConfiguration.background(withIdentifier: identifier)
+        let sessionConfiguration = URLSessionConfiguration.background(withIdentifier: endpoint.backgroundSessionIdentifier ?? "unknown")
         sessionConfiguration.timeoutIntervalForRequest = 20
         sessionConfiguration.timeoutIntervalForResource = 20
         sessionConfiguration.isDiscretionary = false
