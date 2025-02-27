@@ -10,7 +10,7 @@ import Foundation
 public protocol Base {
     var scheme: String { get }
     var host: String { get }
-    var session: URLSession { get }
+    var authenticationHeders: [String: String]? { get }
     var version: String { get }
     var path: String { get }
     var method: RequestMethod { get }

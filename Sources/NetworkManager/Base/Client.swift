@@ -40,7 +40,17 @@ extension Client {
                 request.httpBody = body
             }
 
-            let (data, response) = try await endpoint.session.data(for: request)
+            let sessionConfiguration = URLSessionConfiguration.ephemeral
+            sessionConfiguration.timeoutIntervalForRequest = 20
+            sessionConfiguration.timeoutIntervalForResource = 20
+            sessionConfiguration.sessionSendsLaunchEvents = false
+            
+            if let authenticationHeders = endpoint.authenticationHeders {
+                sessionConfiguration.httpAdditionalHeaders = authenticationHeders
+            }
+            
+            let session = URLSession(configuration: sessionConfiguration)
+            let (data, response) = try await session.data(for: request)
             
             guard let response = response as? HTTPURLResponse else {
                 return .failure(.noResponse)
@@ -110,11 +120,6 @@ extension Client {
         urlComponents.path = endpoint.version + endpoint.path
         urlComponents.queryItems = endpoint.parameters
         
-        let sessionConfiguration = URLSessionConfiguration.background(withIdentifier: identifier)
-        sessionConfiguration.timeoutIntervalForRequest = 20
-        sessionConfiguration.timeoutIntervalForResource = 20
-        sessionConfiguration.isDiscretionary = false
-        
         guard let url = urlComponents.url
         else { return }
         
@@ -125,6 +130,16 @@ extension Client {
         if let body = endpoint.body {
             request.httpBody = body
         }
+        
+        let sessionConfiguration = URLSessionConfiguration.background(withIdentifier: identifier)
+        sessionConfiguration.timeoutIntervalForRequest = 20
+        sessionConfiguration.timeoutIntervalForResource = 20
+        sessionConfiguration.isDiscretionary = false
+        
+        if let authenticationHeders = endpoint.authenticationHeders {
+            sessionConfiguration.httpAdditionalHeaders = authenticationHeders
+        }
+    
         logger.log("Request", data: request.httpBody, level: .info)
         let backgroundSession = URLSession(configuration: sessionConfiguration, delegate: delegate, delegateQueue: nil)
         backgroundSession.downloadTask(with: request).resume()
