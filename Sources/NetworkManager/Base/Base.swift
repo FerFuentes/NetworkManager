@@ -16,6 +16,7 @@ public protocol Base {
     var method: RequestMethod { get }
     var header: [String: String]? { get }
     var authenticationHeders: [String: String]? { get async throws }
+    var onAuthenticationChallenge: (() async throws -> Void)? { get }
     var parameters: [URLQueryItem]? { get }
     var body: Data? { get }
     var boundry: String? { get }

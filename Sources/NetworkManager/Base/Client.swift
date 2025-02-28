@@ -83,6 +83,14 @@ extension Client {
                 
             case 401:
                 logger.log("Unauthorized", level: .error)
+                if let callback = endpoint.onAuthenticationChallenge {
+                    do {
+                        try await callback()
+                    } catch {
+                        logger.log("Error executing authentication callback: \(error.localizedDescription)", level: .error)
+                    }
+                }
+                
                 return .failure(.unauthorized)
                 
             default:
