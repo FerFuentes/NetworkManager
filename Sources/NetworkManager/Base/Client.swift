@@ -9,7 +9,7 @@ import Network
 
 public protocol Client {
     func sendRequest<T: Decodable>(endpoint: Base, responseModel: T.Type) async -> Result<T, RequestError>
-    func sendRequest<T: Decodable>(delegate: URLSessionDelegate, endpoint: Base, responseModel: T.Type)
+    func sendRequest<T: Decodable>(delegate: URLSessionDelegate, endpoint: Base, responseModel: T.Type) async
     func getModelFromLocation<T: Decodable>(_ session: URLSession, downloadTask: URLSessionDownloadTask, location: URL, responseModel: T.Type) -> Result<T, RequestError>
 }
 
@@ -45,7 +45,7 @@ extension Client {
             sessionConfiguration.timeoutIntervalForResource = 20
             sessionConfiguration.sessionSendsLaunchEvents = false
             
-            if let authenticationHeders = endpoint.authenticationHeders {
+            if let authenticationHeders = try? await endpoint.authenticationHeders {
                 sessionConfiguration.httpAdditionalHeaders = authenticationHeders
             }
             
@@ -110,7 +110,7 @@ extension Client {
         delegate: URLSessionDelegate,
         endpoint: Base,
         responseModel: T.Type
-    ) {
+    ) async {
         let logger = DebugLogger.shared
         logger.enableLogging(endpoint.debugMode ?? false)
         var urlComponents = URLComponents()
@@ -135,7 +135,7 @@ extension Client {
         sessionConfiguration.timeoutIntervalForResource = 20
         sessionConfiguration.isDiscretionary = false
         
-        if let authenticationHeders = endpoint.authenticationHeders {
+        if let authenticationHeders = try? await endpoint.authenticationHeders {
             sessionConfiguration.httpAdditionalHeaders = authenticationHeders
         }
     

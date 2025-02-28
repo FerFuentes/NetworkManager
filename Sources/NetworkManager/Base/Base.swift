@@ -15,7 +15,7 @@ public protocol Base {
     var path: String { get }
     var method: RequestMethod { get }
     var header: [String: String]? { get }
-    var authenticationHeders: [String: String]? { get }
+    var authenticationHeders: [String: String]? { get async throws }
     var parameters: [URLQueryItem]? { get }
     var body: Data? { get }
     var boundry: String? { get }
