@@ -198,8 +198,12 @@ extension Client {
             }
             
         case 401:
+            logger.log("Unauthorized", level: .error)
             return .failure(.unauthorized)
             
+        case 404:
+            logger.log("Bad Request", level: .error)
+            return .failure(.badRequest("The requested resource could not be found."))
         default:
             logger.log("Unexpected StatusCode: \(response.statusCode)", level: .error)
             return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
