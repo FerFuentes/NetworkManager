@@ -189,14 +189,11 @@ extension Client {
             )
         case 401:
             return .failure(.unauthorized)
-        case 404:
+        default:
             return decodeErrorResponse(
                 data: location,
                 debugMode: debugMode
             )
-        default:
-            logger.log("Unexpected StatusCode: \(httpResponse.statusCode)", level: .error)
-            return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
         }
     }
 }
