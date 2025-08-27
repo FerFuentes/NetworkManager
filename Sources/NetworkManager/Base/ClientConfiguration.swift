@@ -83,7 +83,10 @@ extension Client {
             return .failure(.unauthorized)
 
         case 404:
-            return decodeErrorResponse(data: data, debugMode: debugMode)
+            return decodeErrorResponse(
+                data: data,
+                debugMode: debugMode
+            )
         default:
             logger.log("Unexpected StatusCode: \(httpResponse.statusCode)", level: .error)
             return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
@@ -177,11 +180,18 @@ extension Client {
 
         switch httpResponse.statusCode {
         case 200...299:
-            return decodeSuccessResponse(data: location, responseModel: responseModel)
+            return decodeSuccessResponse(
+                data: location,
+                responseModel: responseModel,
+                debugMode: debugMode
+            )
         case 401:
             return .failure(.unauthorized)
         case 404:
-            return decodeErrorResponse(data: location)
+            return decodeErrorResponse(
+                data: location,
+                debugMode: debugMode
+            )
         default:
             logger.log("❌ [Client] Unexpected StatusCode: \(httpResponse.statusCode)")
             return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))

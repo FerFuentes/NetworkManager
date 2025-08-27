@@ -45,7 +45,9 @@ extension Client {
                 response, data: data,
                 responseModel: responseModel,
                 request: request,
-                endpoint: endpoint)
+                endpoint: endpoint,
+                debugMode: endpoint.debugMode ?? false
+            )
 
         } catch let error as NSError {
             return handleError(error)
