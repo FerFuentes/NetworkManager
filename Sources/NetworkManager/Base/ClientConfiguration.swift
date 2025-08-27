@@ -89,15 +89,11 @@ extension Client {
             }
 
             return .failure(.unauthorized)
-
-        case 404:
+        default:
             return decodeErrorResponse(
                 data: data,
                 debugMode: debugMode
             )
-        default:
-            logger.log("Unexpected StatusCode: \(httpResponse.statusCode)", level: .error)
-            return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
         }
 
     }
