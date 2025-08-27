@@ -58,7 +58,15 @@ extension Client {
             return .failure(.noResponse)
         }
 
-        logger.log("Status code: \(httpResponse.statusCode)", data: request.httpBody, level: .info)
+        let urlString = request.url?.absoluteString.isEmpty == false
+            ? request.url!.absoluteString
+            : "Unknown URL"
+
+        logger.log(
+            "Request: \(urlString), Status Code: \(httpResponse.statusCode)",
+            data: request.httpBody,
+            level: .info
+        )
 
 
         switch httpResponse.statusCode {
