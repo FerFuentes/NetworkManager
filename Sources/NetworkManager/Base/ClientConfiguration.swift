@@ -58,7 +58,7 @@ extension Client {
             return .failure(.noResponse)
         }
 
-        logger.log("[Client] Request: \(request), Code: \(httpResponse.statusCode)")
+        logger.log("Status code: \(httpResponse.statusCode)", data: request.httpBody, level: .info)
 
 
         switch httpResponse.statusCode {
@@ -71,12 +71,12 @@ extension Client {
                 debugMode: debugMode
             )
         case 401:
-            logger.log("Unauthorized", level: .error)
+            logger.log("❌ Unauthorized", level: .error)
             if let callback = endpoint.onAuthenticationChallenge {
                 do {
                     try await callback()
                 } catch {
-                    logger.log("Error executing authentication callback: \(error.localizedDescription)", level: .error)
+                    logger.log("❌ Error executing authentication callback: \(error.localizedDescription)", level: .error)
                 }
             }
 
@@ -88,7 +88,7 @@ extension Client {
                 debugMode: debugMode
             )
         default:
-            logger.log("Unexpected StatusCode: \(httpResponse.statusCode)", level: .error)
+            logger.log("❌ Unexpected StatusCode: \(httpResponse.statusCode)", level: .error)
             return .failure(.unexpectedStatusCode("We are unable to retrieve your information at this time, please try again later."))
         }
 
@@ -106,10 +106,10 @@ extension Client {
         } else {
             do {
                 let decodedResponse = try JSONDecoder().decode(responseModel, from: data)
-                logger.log("[Client] Response: \(decodedResponse)")
+                logger.log("✅ Response", data: data, level: .info)
                 return .success(decodedResponse)
             } catch {
-                logger.log("❌ [Client] Decode error: \(error.localizedDescription)")
+                logger.log("❌ Decode error: \(error.localizedDescription)", level: .error)
                 return .failure(.unexpectedError(error.localizedDescription))
             }
         }
@@ -122,10 +122,10 @@ extension Client {
         do {
             let decodedResponse = try JSONDecoder().decode(ErrorResponse.self, from: data)
             let message = decodedResponse.message
-            logger.log("❌ [Client] Error Response: \(decodedResponse)")
+            logger.log("❌ Error Response:", data: data, level: .error)
             return .failure(.badRequest(message))
         } catch {
-            logger.log("❌ [Client] Decode error: \(error.localizedDescription)")
+            logger.log("❌ Decode error: \(error.localizedDescription)", level: .error)
             return .failure(.unexpectedError(error.localizedDescription))
         }
     }
